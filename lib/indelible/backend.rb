@@ -1,5 +1,5 @@
 require 'pp'
-module ZenNote
+module Indelible
   # TODO: conflicts when filename already exists (note starts the same way)
   class SyncBackend
     def initialize(email, password, path)
@@ -14,37 +14,46 @@ module ZenNote
 
     def update_local_index
       @index.notes.each do |key, note|
-        if note['status'] == 'synced' &&
+        if note['status'] == 'in_sync' &&
             !File.exist?(note['path'])
           @index.remove_note key
         end
       end
-      
+
       @index.update_hashes
+    end
+
+    def make_remote_index_manageable(remote_index)
+      new_index = {}
+      remote_index.each do |note|
+        new_index[note['key']] = { 'modify' => note['modify'],
+          'deleted' => note['deleted'] }
+      end
+      new_index
     end
 
     # TODO: make more clever and efficient
     def sync
-      remote_index = @simplenote.get_index
+      remote_index = make_remote_index_manageable @simplenote.get_index
       update_local_index
-      
+      update_timestamps = []
+
       diff = @index.diff remote_index
-      
-      pp diff
-      
+
       diff[:push].each do |key|
         note = @index.retrieve_note key
         contents = open(note['path']).read
-        puts "updating #{key}"
+        puts "Updating #{key}"
         @simplenote.update_note key, contents
+        update_timestamps << key
       end
-      
+
       diff[:retrieve].each do |key|
         begin
           note = @simplenote.get_note(key).to_s
           filename = get_filename note
           open(filename, 'w') { |f| f << note }
-          modified = remote_index.find { |n| n['key'] }['modify']
+          modified = remote_index[key]['modify']
           puts "Retrieving #{key}"
           @index.store_note key, modified, filename
         rescue
@@ -65,11 +74,21 @@ module ZenNote
       end
 
       Dir.glob(File.join(@path, "*")).each do |file|
+        next if file =~ /~$/
         if !@index.note_path_exists?(file)
-          puts "creating #{file}"
+          puts "Creating #{file}"
           key = @simplenote.create_note(open(file).read).to_s
-          modified = Time.now.strftime '%Y-%m-%d %H:%M:%S'
+          update_timestamps << key
           @index.store_note key, modified, file
+        end
+      end
+
+      # Update timestamps
+      if !update_timestamps.empty?
+        remote_index = make_remote_index_manageable @simplenote.get_index
+        update_timestamps.each do |key|
+          note = @index.retrieve_note key
+          @index.store_note key, remote_index[key]['modify'], note['path']
         end
       end
 
