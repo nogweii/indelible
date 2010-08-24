@@ -1,11 +1,10 @@
-require 'pp'
 module Indelible
   # TODO: conflicts when filename already exists (note starts the same way)
   class SyncBackend
     def initialize(email, password, path)
       @email      = email
       @password   = password
-      @poll_freq  = 20
+      @poll_freq  = 1200    # 20 minutes
       @path       = path
       @index      = load_index
       @simplenote = SimpleNote.new
@@ -32,6 +31,14 @@ module Indelible
       new_index
     end
 
+    def run
+      loop do
+        sync
+        open("/home/dodecaphonic/Desktop/jklsdfjlksad.txt", "w") { |f| f << Time.now.to_s }
+        sleep @poll_freq
+      end
+    end
+
     # TODO: make more clever and efficient
     def sync
       remote_index = make_remote_index_manageable @simplenote.get_index
@@ -43,7 +50,6 @@ module Indelible
       diff[:push].each do |key|
         note = @index.retrieve_note key
         contents = open(note['path']).read
-        puts "Updating #{key}"
         @simplenote.update_note key, contents
         update_timestamps << key
       end
@@ -54,7 +60,6 @@ module Indelible
           filename = get_filename note
           open(filename, 'w') { |f| f << note }
           modified = remote_index[key]['modify']
-          puts "Retrieving #{key}"
           @index.store_note key, modified, filename
         rescue
           raise

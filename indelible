@@ -1,0 +1,39 @@
+#!/usr/bin/env ruby
+
+$: << "lib"
+require 'indelible'
+
+def create_config_file
+  puts "Let's create your config file before using Indelible."
+  puts "You will only need to provide your SimpleNote credentials and a folder to store your text files."
+  print "\nSimpleNote username: "
+  user = STDIN.gets.chomp
+  print "SimpleNote password: "
+  password = STDIN.gets.chomp
+  print "Folder: "
+  folder = STDIN.gets.chomp
+
+  open(File.join(ENV['HOME'], '.indeliblerc'), 'w') { |f|
+    f << ({ 'user' => user, 'password' => password, 'folder' => File.expand_path(folder) }.to_json)
+  }
+  nil
+end
+
+def load_config_file
+  config = JSON.load open(File.join(ENV['HOME'], '.indeliblerc'))
+  $user = config['user']
+  $password = config['password']
+  $folder = config['folder']
+end
+
+def init
+  create_config_file if !File.exist?(File.join(ENV['HOME'], '.indeliblerc'))
+  load_config_file
+end
+
+init
+
+Daemons.run_proc('backend.rb') do
+  backend = Indelible::SyncBackend.new($user, $password, $folder)
+  backend.run
+end
