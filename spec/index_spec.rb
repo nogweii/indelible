@@ -14,8 +14,15 @@ describe Indelible::Index do
     'hashes' => {}, 'paths' => {}
   }
 
+  before :all do
+    open(File.join('/tmp', Indelible::Index::FILENAME), 'w') { |f| f << BASE_INDEX.to_json }
+  end
+
+  after :all do
+    File.unlink File.join('/tmp', Indelible::Index::FILENAME)
+  end
+
   before :each do
-    open(File.join('/tmp', '.indelible'), 'w') { |f| f << BASE_INDEX.to_json }
     @index = Indelible::Index.new('/tmp')
   end
 
