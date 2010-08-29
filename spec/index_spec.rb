@@ -1,4 +1,5 @@
 require 'lib/indelible'
+require 'spec/autorun'
 
 describe Indelible::Index do
   BASE_INDEX = { 'created' => Time.now, 'last_synced' => nil,
