@@ -77,7 +77,7 @@ module Indelible
         end
       end
 
-      Dir.glob(File.join(@path, "*")).each do |file|
+      Dir.glob(File.join(@path, "*.txt")).each do |file|
         next if file =~ /~$/
         if !@index.note_path_exists?(file)
           puts "Creating #{file}"
