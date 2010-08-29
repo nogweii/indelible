@@ -34,7 +34,6 @@ module Indelible
     def run
       loop do
         sync
-        open("/home/dodecaphonic/Desktop/jklsdfjlksad.txt", "w") { |f| f << Time.now.to_s }
         sleep @poll_freq
       end
     end
