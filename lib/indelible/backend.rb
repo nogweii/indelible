@@ -106,7 +106,7 @@ module Indelible
 
     private
     def load_index
-      Index.create!(@path) if !Index.exists?(@path)
+      Index.create!(@path) if !File.exists?(@path)
       Index.new @path
     end
   end
