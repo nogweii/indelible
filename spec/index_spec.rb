@@ -30,7 +30,7 @@ describe ZenNote::Index do
   end
 
   it 'should store and retrieve note' do
-    MD5.should_receive(:md5).and_return('sfjlsafjksajkfqw90324')
+    Digest::MD5.should_receive(:hexdigest).and_return('sfjlsafjksajkfqw90324')
     File.should_receive(:open).and_return(Struct.new(:read).new(''))
     @index.store_note('ee8fd1', '2010-08-24 10:32:00', '/tmp/gamei.txt').should == nil
     @index.retrieve_note('ee8fd1').should == { 'modified' => '2010-08-24 10:32:00', 'path' => '/tmp/gamei.txt', 'status' => 'synced' }

@@ -28,7 +28,7 @@ module Indelible
 
     def store_note(note_id, modified, path)
       @dirty = true
-      hash = MD5.md5(File.open(path).read).to_s
+      hash = Digest::MD5.hexdigest(File.open(path).read).to_s
       @state['paths'][path] = note_id
       @state['notes'][note_id] = { 'modified' => modified,
                                    'path' => path,
@@ -151,7 +151,7 @@ module Indelible
     def update_hashes
       @state['notes'].each do |key, note|
         if note['status'] != 'delete_remote'
-          new_hash = MD5.md5(File.open(note['path']).read).to_s
+          new_hash = Digest::MD5.hexdigest(File.open(note['path']).read).to_s
           if @state['hashes'][key] != new_hash
             note['status'] = 'update_remote'
           end
