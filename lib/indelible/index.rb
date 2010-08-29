@@ -144,10 +144,6 @@ module Indelible
       File.open(path, 'w') { |f| f << BASE_INDEX.to_json }
     end
 
-    def self.exists?(path)
-      File.exist?(path)
-    end
-
     def update_hashes
       @state['notes'].each do |key, note|
         if note['status'] != 'delete_remote'
@@ -162,7 +158,7 @@ module Indelible
     end
 
     def load
-      Index.create!(@path) if !Index.exists?(@path)
+      Index.create!(@path) if !File.exists?(@path)
       JSON.load(File.open(@path))
     end
   end
