@@ -24,6 +24,7 @@ describe Indelible::Index do
 
   before :each do
     @index = Indelible::Index.new('/tmp')
+    @index.load
   end
 
   it 'should retrieve notes' do
