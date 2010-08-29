@@ -23,7 +23,7 @@ module Indelible
     end
 
     def note_exists?(note_id)
-      @state['notes'].has_key? note_id
+      @state['notes'].has_key? note_id && @state['notes'][note_id]['status'] != 'deleted'
     end
 
     def store_note(note_id, modified, path)
@@ -64,7 +64,7 @@ module Indelible
     end
 
     def retrieve_note(note_id)
-      @state['notes'][note_id]
+      note_exists?(note_id) ? @state['notes'][note_id] : nil
     end
 
     def get_local_path(note_id)
