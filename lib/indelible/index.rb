@@ -1,6 +1,6 @@
 module Indelible
   class Index
-    FILENAME   = ".zennote".freeze
+    FILENAME   = ".indelible".freeze
     BASE_INDEX = { 'created' => Time.now.strftime("%Y-%m-%d %H:%M:%S"),
                    'last_synced' => nil, 'notes' => {}, 'hashes' => {},
                    'paths'   => {} }.freeze

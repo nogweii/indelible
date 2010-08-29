@@ -1,5 +1,4 @@
 require 'lib/indelible'
-require 'pp'
 
 describe Indelible::Index do
   BASE_INDEX = { 'created' => Time.now, 'last_synced' => nil,
@@ -15,7 +14,7 @@ describe Indelible::Index do
   }
 
   before :each do
-    open(File.join('/tmp', '.zennote'), 'w') { |f| f << BASE_INDEX.to_json }
+    open(File.join('/tmp', '.indelible'), 'w') { |f| f << BASE_INDEX.to_json }
     @index = Indelible::Index.new('/tmp')
   end
 
