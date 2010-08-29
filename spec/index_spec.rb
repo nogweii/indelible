@@ -1,7 +1,7 @@
-require 'lib/simplenote'
+require 'lib/indelible'
 require 'pp'
 
-describe ZenNote::Index do
+describe Indelible::Index do
   BASE_INDEX = { 'created' => Time.now, 'last_synced' => nil,
     'count' => 2, 'notes' => {
       'c5dda1' => { 'modified' => '2010-10-10 10:10:10',
@@ -16,7 +16,7 @@ describe ZenNote::Index do
 
   before :each do
     open(File.join('/tmp', '.zennote'), 'w') { |f| f << BASE_INDEX.to_json }
-    @index = ZenNote::Index.new('/tmp')
+    @index = Indelible::Index.new('/tmp')
   end
 
   it 'should retrieve notes' do
